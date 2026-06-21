@@ -6,7 +6,6 @@ import React, { useMemo } from 'react';
 import { useChessGame } from './hooks/useChessGame';
 import ChessBoard from './components/ChessBoard';
 import GameInfo from './components/GameInfo';
-import { inCheck } from './utils/chessLogic';
 
 function App() {
   const {
@@ -73,8 +72,8 @@ function App() {
           {/* Player indicator - top (Black) */}
           <div className="flex items-center justify-between mb-2 px-1">
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${!turn
-                ? 'bg-yellow-500/20 border border-yellow-500/40'
-                : 'bg-white/5 border border-white/10'
+              ? 'bg-yellow-500/20 border border-yellow-500/40'
+              : 'bg-white/5 border border-white/10'
               }`}>
               <div className="w-3 h-3 rounded-full bg-gray-800 border border-gray-600"></div>
               <span className="text-gray-300 text-sm font-semibold">Hitam ♚</span>
@@ -99,8 +98,8 @@ function App() {
           {/* Player indicator - bottom (White) */}
           <div className="flex items-center justify-between mt-2 px-1">
             <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${turn
-                ? 'bg-yellow-500/20 border border-yellow-500/40'
-                : 'bg-white/5 border border-white/10'
+              ? 'bg-yellow-500/20 border border-yellow-500/40'
+              : 'bg-white/5 border border-white/10'
               }`}>
               <div className="w-3 h-3 rounded-full bg-white border border-gray-400"></div>
               <span className="text-gray-300 text-sm font-semibold">Putih ♔</span>
