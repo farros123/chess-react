@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .square {
+    @apply relative cursor-pointer transition-colors duration-150;
+    width: 12.5%;
+    padding-bottom: 12.5%;
+  }
+
+  .square-light {
+    @apply bg-chess-light;
+  }
+
+  .square-dark {
+    @apply bg-chess-dark;
+  }
+
+  .square-selected {
+    @apply bg-chess-selected !important;
+  }
+
+  .piece {
+    @apply absolute inset-0 flex items-center justify-center select-none pointer-events-none;
+    font-size: clamp(1.5rem, 5vw, 3.5rem);
+  }
+}
+
+@layer utilities {
+  .valid-move-dot::after {
+    content: '';
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] bg-black/20 rounded-full;
+  }
+
+  .valid-capture-ring {
+    box-shadow: inset 0 0 0 4px rgba(220, 38, 38, 0.6);
+  }
+}
