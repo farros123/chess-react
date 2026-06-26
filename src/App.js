@@ -17,8 +17,12 @@ function App() {
     winner,
     moveHistory,
     capturedPieces,
+    gameMode,
+    aiLevel,
+    isAIThinking,
     handleSquareClick,
     resetGame,
+    startGame,
     isValidMoveTarget,
     isValidCapture,
   } = useChessGame();
@@ -65,6 +69,10 @@ function App() {
           moveHistory={moveHistory}
           capturedPieces={capturedPieces}
           onReset={resetGame}
+          gameMode={gameMode}
+          aiLevel={aiLevel}
+          isAIThinking={isAIThinking}
+          onStartGame={startGame}
         />
 
         {/* Chess Board - Center */}
@@ -76,8 +84,13 @@ function App() {
               : 'bg-white/5 border border-white/10'
               }`}>
               <div className="w-3 h-3 rounded-full bg-gray-800 border border-gray-600"></div>
-              <span className="text-gray-300 text-sm font-semibold">Hitam ♚</span>
+              <span className="text-gray-300 text-sm font-semibold">
+                {gameMode === 'ai' ? 'Hitam 🤖 AI' : 'Hitam ♚'}
+              </span>
             </div>
+            {isAIThinking && (
+              <span className="text-purple-400 text-xs animate-pulse">Berpikir...</span>
+            )}
             {gameStatus === 'checkmate' && winner === 'black' && (
               <span className="text-emerald-400 font-bold text-sm animate-pulse">🏆 Pemenang!</span>
             )}
@@ -102,7 +115,9 @@ function App() {
               : 'bg-white/5 border border-white/10'
               }`}>
               <div className="w-3 h-3 rounded-full bg-white border border-gray-400"></div>
-              <span className="text-gray-300 text-sm font-semibold">Putih ♔</span>
+              <span className="text-gray-300 text-sm font-semibold">
+                {gameMode === 'ai' ? 'Putih 👤 Kamu' : 'Putih ♔'}
+              </span>
             </div>
             {gameStatus === 'checkmate' && winner === 'white' && (
               <span className="text-emerald-400 font-bold text-sm animate-pulse">🏆 Pemenang!</span>
@@ -114,7 +129,7 @@ function App() {
       {/* Footer */}
       <footer className="mt-8 text-center">
         <p className="text-gray-600 text-xs">
-          Dibuat dengan React & Tailwind CSS • Fitur: Skakmat, Stalemate, Promosi Pion
+          Dibuat dengan React & Tailwind CSS • Fitur: Skakmat, Stalemate, Promosi Pion, AI Lawan
         </p>
       </footer>
     </div>

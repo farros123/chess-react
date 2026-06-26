@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PIECES } from '../utils/chessLogic';
 
 const GameInfo = ({
@@ -7,8 +7,14 @@ const GameInfo = ({
   winner,
   moveHistory,
   capturedPieces,
-  onReset
+  onReset,
+  gameMode,
+  aiLevel,
+  isAIThinking,
+  onStartGame,
 }) => {
+  const [showAILevels, setShowAILevels] = useState(false);
+
   const getStatusMessage = () => {
     switch (gameStatus) {
       case 'checkmate':
@@ -23,6 +29,9 @@ const GameInfo = ({
   };
 
   const getTurnLabel = () => {
+    if (gameMode === 'ai') {
+      return turn ? 'Putih (Kamu) ♔' : 'Hitam (AI) ♚';
+    }
     return turn ? 'Putih ♔' : 'Hitam ♚';
   };
 
@@ -33,16 +42,102 @@ const GameInfo = ({
 
   const whiteAdvantage = getMaterialValue(capturedPieces.white) - getMaterialValue(capturedPieces.black);
 
+  const getLevelLabel = (level) => {
+    switch (level) {
+      case 1: return '🟢 Pemula';
+      case 2: return '🟡 Menengah';
+      case 3: return '🔴 Sulit';
+      default: return '';
+    }
+  };
+
+  const getLevelDescription = (level) => {
+    switch (level) {
+      case 1: return 'Langkah acak';
+      case 2: return 'Berpikir 2 langkah';
+      case 3: return 'Berpikir 3 langkah';
+      default: return '';
+    }
+  };
+
+  // ---- Game Mode Selection Screen ----
+  if (!gameMode) {
+    return (
+      <div className="flex flex-col gap-4 w-full lg:w-72">
+        <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20">
+          <h2 className="text-white font-bold text-lg mb-1 text-center">🎮 Pilih Mode</h2>
+          <p className="text-gray-400 text-xs text-center mb-4">Pilih cara bermain</p>
+
+          {/* PvP Button */}
+          <button
+            onClick={() => onStartGame('pvp')}
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] mb-3 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25"
+          >
+            <span className="text-lg">👥</span>
+            <span>2 Pemain (PvP)</span>
+          </button>
+
+          {/* VS AI Button */}
+          {!showAILevels ? (
+            <button
+              onClick={() => setShowAILevels(true)}
+              className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25"
+            >
+              <span className="text-lg">🤖</span>
+              <span>Lawan AI</span>
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-gray-300 text-xs font-semibold mb-2 text-center">Pilih Level AI:</p>
+              {[1, 2, 3].map(level => (
+                <button
+                  key={level}
+                  onClick={() => onStartGame('ai', level)}
+                  className="w-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white py-2.5 px-4 rounded-lg text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-between"
+                >
+                  <span className="font-semibold">{getLevelLabel(level)}</span>
+                  <span className="text-white/50 text-xs">{getLevelDescription(level)}</span>
+                </button>
+              ))}
+              <button
+                onClick={() => setShowAILevels(false)}
+                className="w-full text-gray-400 hover:text-gray-300 text-xs py-1 transition-colors"
+              >
+                ← Kembali
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ---- In-Game UI ----
   return (
     <div className="flex flex-col gap-4 w-full lg:w-64">
-      {/* Turn Display */}
+      {/* Mode & Turn Display */}
       <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+        {/* Game mode badge */}
+        <div className="flex items-center justify-center mb-3">
+          <span className="bg-white/10 text-gray-300 text-xs px-3 py-1 rounded-full border border-white/10 font-medium">
+            {gameMode === 'ai' ? `🤖 vs AI ${getLevelLabel(aiLevel)}` : '👥 2 Pemain'}
+          </span>
+        </div>
+
         <div className="flex items-center justify-between mb-2">
           <span className="text-gray-300 text-sm font-medium">Giliran:</span>
           <span className={`font-bold text-lg ${turn ? 'text-white' : 'text-gray-400'}`}>
             {getTurnLabel()}
           </span>
         </div>
+
+        {/* AI Thinking Indicator */}
+        {isAIThinking && (
+          <div className="text-center py-2 px-3 rounded-lg text-sm bg-purple-500/20 text-purple-300 border border-purple-500/30 animate-pulse flex items-center justify-center gap-2">
+            <span className="inline-block w-2 h-2 bg-purple-400 rounded-full animate-bounce"></span>
+            <span>🤖 AI sedang berpikir...</span>
+          </div>
+        )}
 
         {/* Status */}
         {gameStatus !== 'playing' && (
@@ -76,7 +171,9 @@ const GameInfo = ({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-white border border-gray-400"></div>
-            <span className="text-white text-sm font-semibold">Putih</span>
+            <span className="text-white text-sm font-semibold">
+              {gameMode === 'ai' ? 'Putih (Kamu)' : 'Putih'}
+            </span>
           </div>
           {whiteAdvantage > 0 && (
             <span className="text-emerald-400 text-xs font-bold">+{whiteAdvantage}</span>
@@ -97,7 +194,9 @@ const GameInfo = ({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-gray-900 border border-gray-600"></div>
-            <span className="text-white text-sm font-semibold">Hitam</span>
+            <span className="text-white text-sm font-semibold">
+              {gameMode === 'ai' ? 'Hitam (AI)' : 'Hitam'}
+            </span>
           </div>
           {whiteAdvantage < 0 && (
             <span className="text-emerald-400 text-xs font-bold">+{Math.abs(whiteAdvantage)}</span>
